@@ -250,7 +250,7 @@ class WebSockifyRequestHandler(WebSocketRequestHandlerMixIn, SimpleHTTPRequestHa
             self.rec.write("var VNC_frame_data = [\n")
 
         try:
-            self.new_websocket_client()
+            self.new_websocket_client(client_addr)
         except self.CClose:
             # Close the client
             _, exc, _ = sys.exc_info()
@@ -489,7 +489,7 @@ class WebSockifyServer(object):
 
     @staticmethod
     def daemonize(keepfd=None, chdir='/'):
-        
+
         if keepfd is None:
             keepfd = []
 
@@ -562,7 +562,7 @@ class WebSockifyServer(object):
                                   % self.cert)
             retsock = None
             try:
-                if (hasattr(ssl, 'create_default_context') 
+                if (hasattr(ssl, 'create_default_context')
                     and callable(ssl.create_default_context)):
                     # create new-style SSL wrapping for extended features
                     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)

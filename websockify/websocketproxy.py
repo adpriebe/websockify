@@ -46,15 +46,15 @@ Traffic Legend:
     <  - Client send
     <. - Client send partial
 """
-    
+
     def send_auth_error(self, ex):
         self.send_response(ex.code, ex.msg)
         self.send_header('Content-Type', 'text/html')
         for name, val in ex.headers.items():
             self.send_header(name, val)
-        
+
         self.end_headers()
-    
+
     def validate_connection(self):
         if not self.server.token_plugin:
             return
@@ -83,7 +83,7 @@ Traffic Legend:
         except (TypeError, AttributeError, KeyError):
             # not a SSL connection or client presented no certificate with valid data
             pass
-            
+
         try:
             self.server.auth_plugin.authenticate(
                 headers=self.headers, target_host=self.server.target_host,
@@ -93,7 +93,7 @@ Traffic Legend:
             self.send_auth_error(ex)
             raise
 
-    def new_websocket_client(self):
+    def new_websocket_client(self, client_ip_addr):
         """
         Called after a new WebSocket connection has been established.
         """
@@ -128,6 +128,10 @@ Traffic Legend:
             tsock.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
 
         self.print_traffic(self.traffic_legend)
+
+        # send real host ip
+        self.log_message("REAL_CLIENT_IP %s" % client_ip_addr)
+        tsock.send(str.encode("REAL_CLIENT_IP %s" % client_ip_addr))
 
         # Start proxying
         try:
@@ -433,7 +437,7 @@ def select_ssl_version(version):
         # It so happens that version names sorted lexicographically form a list
         # from the least to the most secure
         keys = list(SSL_OPTIONS.keys())
-        keys.sort() 
+        keys.sort()
         fallback = keys[-1]
         logger = logging.getLogger(WebSocketProxy.log_prefix)
         logger.warn("TLS version %s unsupported. Falling back to %s",
