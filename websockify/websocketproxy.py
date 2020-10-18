@@ -130,7 +130,7 @@ Traffic Legend:
         self.print_traffic(self.traffic_legend)
 
         # send real host ip
-        self.log_message("REAL_CLIENT_IP %s" % client_ip_addr)
+        # self.log_message("REAL_CLIENT_IP %s" % client_ip_addr)
         tsock.send(str.encode("REAL_CLIENT_IP %s" % client_ip_addr))
 
         # Start proxying
